@@ -14,3 +14,9 @@ Backup of *.doc*
 
 # PowerPoint temporary
 ~$*.ppt*
+
+# Directory
+node_modules/
+
+# File
+package-lock.json
