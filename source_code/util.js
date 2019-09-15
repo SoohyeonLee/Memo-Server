@@ -5,6 +5,8 @@ var jwt = require('jsonwebtoken');
 
 var util = {};
 
+util.secret = "느엉"
+
 util.successTrue = function (data) {
     return {
         success: true,
@@ -39,23 +41,24 @@ util.parseError = function (errors) {
     return parsed;
 };
 
-util.verifyJWT = function (res, data) {
+util.verifyJWT = function (token) {
 
-    var decode = '';
+    var success = false;
+    var result = '';
 
     try {
         decode = jwt.verify(token, util.secret);
-
-        // exp 체크 //
-
-        //////////////
-
+        
+        success = true;
+        result = decode;
     } catch (err) {
-        return res.json(util.successFalse(err, 'Token 검증 실패'))
+        result = err;
     }
 
-    return decode;
+    return {
+        success: success,
+        result: result
+    };
 };
 
-util.secret = "느엉"
 module.exports = util;

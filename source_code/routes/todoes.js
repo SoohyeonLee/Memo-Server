@@ -1,26 +1,30 @@
 var util = require('../util');
 var express = require('express');
 var models = require('../models');
-var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
 router.route('/')
     .put(function (req, res, next) {
+        /* 
+        url         : ~/todoes
+        method      : put
+        input       : header    - x-access-token
+                      body      - N/A
+        output      : success or err
+        description : 할 일 추가, 입력된 할 일 정보를 DB에 insert 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
 
-        var token = req.body['token'];
-        var decode = '';
+        result_JWT = util.verifyJWT(token)
 
-        try {
-            decode = jwt.verify(token, util.secret);
-
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
         var name = req.body['category_name'];
@@ -43,23 +47,27 @@ router.route('/')
             .catch(function (err) {
                 res.json(util.successFalse(err))
             });
-
     })
-    .post(function (req, res, next) {
+    .get(function (req, res, next) {
+        /* 
+        url         : ~/todoes
+        method      : get
+        input       : header    - x-access-token
+                      body      - N/A
+        output      : todo list
+        description : 할 일 조회, 입력된 사용자의 할 일 정보 목록 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
 
-        var token = req.body['token'];
+        result_JWT = util.verifyJWT(token)
 
-        var decode = '';
-
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
         models.todoes.findAll(
@@ -79,19 +87,26 @@ router.route('/')
             });
     })
     .patch(function (req, res, next) {
+        /* 
+        url         : ~/todoes
+        method      : patch
+        input       : header    - x-access-token
+                      body      - todo_id, category_name, todo_text, 
+                                  todo_update_time, todo_target_time, todo_check
+        output      : success or err
+        description : 할 일 수정, 입력된 할 일 정보를 DB에 update 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
 
-        var token = req.body['token'];
-        var decode = '';
+        result_JWT = util.verifyJWT(token)
 
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
         var id = req.body['todo_id'];
@@ -112,37 +127,39 @@ router.route('/')
             },
             {
                 where: { user_id: decode.user_id }
-            }
-        )
+            })
             .then(result => {
                 res.json(util.successTrue())
             })
             .catch(function (err) {
                 res.json(util.successFalse(err))
             });
-
-
     })
-
     .delete(function (req, res, next) {
+        /* 
+        url         : ~/todoes
+        method      : delete
+        input       : header    - x-access-token
+                      body      - todo_id
+        output      : success or err
+        description : 할 일 삭제, 입력된 할 일 정보를 DB에서 delete 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
 
-        var token = req.body['token'];
-        var decode = '';
+        result_JWT = util.verifyJWT(token)
 
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
-        var id = req.body['todo_id'];
+        var id = req.headers['todo_id'];
 
-        models.categories.destroy(
+        models.todoes.destroy(
             {
                 where: {
                     user_id: decode.user_id,
@@ -150,6 +167,52 @@ router.route('/')
                 }
             })
             .then(function () {
+                res.json(util.successTrue())
+            })
+            .catch(function (err) {
+                res.json(util.successFalse(err))
+            });
+    })
+
+router.route('/check')
+    .patch(function (req, res, next) {
+        /* 
+        url         : ~/todoes/check
+        method      : patch
+        input       : header    - x-access-token
+                      body      - todo_id, todo_check
+        output      : success or err
+        description : 할 일 확인, 입력된 할 일 수행 정보를 DB에 update 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
+
+        result_JWT = util.verifyJWT(token)
+
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
+        }
+
+        var uid = decode.user_id
+
+        var id = req.body['todo_id'];
+        var check = req.body['todo_check'];
+
+        models.todoes.update(
+            {
+                todo_check: check
+            },
+            {
+                where: {
+                    todo_id: id,
+                    user_id: uid
+                }
+            })
+            .then(result => {
                 res.json(util.successTrue())
             })
             .catch(function (err) {

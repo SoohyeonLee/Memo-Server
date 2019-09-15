@@ -1,28 +1,33 @@
 var util = require('../util');
 var express = require('express');
 var models = require('../models');
-var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
 router.route('/')
     .put(function (req, res, next) {
+        /* 
+        url         : ~/categories
+        method      : put
+        input       : header    - x-access-token
+                      body      - category_name
+        output      : success or err
+        description : 분류 추가, 입력된 분류 정보를 DB에 insert 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
+     
+        result_JWT = util.verifyJWT(token)
+
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
+        }
 
         var name = req.body['category_name'];
-
-        var token = req.body['token'];
-        var decode = '';
-
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
-        }
 
         models.categories.create(
             {
@@ -37,19 +42,26 @@ router.route('/')
             });
 
     })
-    .post(function (req, res, next) {
-        var token = req.body['token'];
-        var decode = '';
+    .get(function (req, res, next) {
+        /* 
+        url         : ~/categories
+        method      : get
+        input       : header    - x-access-token
+                      body      - N/A
+        output      : category list
+        description : 분류 조회, 입력된 사용자의 분류 정보 목록 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
+     
+        result_JWT = util.verifyJWT(token)
 
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
         models.categories.findAll(
@@ -69,22 +81,29 @@ router.route('/')
             });
     })
     .delete(function (req, res, next) {
+        /* 
+        url         : ~/categories
+        method      : delete
+        input       : header    - x-access-token
+                      body      - category_name
+        output      : success or err
+        description : 분류 삭제, 입력된 분류 정보를 DB에서 delete 후 성공 여부 반환
+        */
+        var token = req.headers['x-access-token'];
+        var result_JWT = '';
+        var decord = '';
+     
+        result_JWT = util.verifyJWT(token)
 
-        var name = req.body['category_name'];
-        var token = req.body['token'];
-        var decode = '';
-
-        try {
-            decode = jwt.verify(token, util.secret);
-
-            // exp 체크 //
-
-            //////////////
-
-        } catch (err) {
-            return res.json(util.successFalse(err, 'Token 검증 실패'))
+        if (result_JWT.success == true) {
+            decord = result_JWT.result;
+        }
+        else {
+            return res.json(util.successFalse(result_JWT.result, 'Token 검증 실패'))
         }
 
+        var name = req.body['category_name'];
+        
         models.categories.destroy(
             {
                 where: {

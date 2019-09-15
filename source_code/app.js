@@ -1,8 +1,9 @@
 var cors        = require('cors');
-var mysql       = require('mysql');
 var morgan      = require('morgan');
 var express     = require('express');
 var bodyParser  = require('body-parser');
+
+//var stream = require('./configs/winston')
 
 var models = require('./models/index');
 
@@ -15,9 +16,11 @@ models.sequelize.sync().then( () => {
 
 const app = express();
 
+// 미들 웨어 //
 app.use(cors());
+app.use(morgan('short'))
+//app.use(morgan('combined', { stream }))
 
-app.use(morgan('short')) //로그 미들웨어
 app.use(express.static('./public')) //기본 파일 폴더 위치 설정
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json({type: 'application/json'}));
